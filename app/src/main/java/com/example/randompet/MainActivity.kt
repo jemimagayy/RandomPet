@@ -19,9 +19,10 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         val button = findViewById<Button>(R.id.petButton)
+        val imageView = findViewById<ImageView>(R.id.petImage)
 
-        val petButton = null
-        petButton?.let { setupButton(it) }
+        setupButton(button)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -29,16 +30,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchDogImage(imageview: ImageView) {
+    private fun fetchDogImage() {
         val client = AsyncHttpClient()
 
         client["https://dog.ceo/api/breeds/image/random", object : JsonHttpResponseHandler() {
-            override fun onSuccess(statusCode: Int, headers: Headers, json: JSON) {
-                val imageView = findViewById<ImageView>(R.id.petImage)
+            override fun onSuccess(statusCode: Int, headers: Headers, json: JsonHttpResponseHandler.JSON) {
                 val petImageURL = json.jsonObject.getString("message")
                 Log.d("petImageURL", "pet image URL set: $petImageURL")
                 Log.d("Dog", "response successful: $json")
 
+                val imageView = findViewById<ImageView>(R.id.petImage)
                 Glide.with(this@MainActivity).load(petImageURL).fitCenter().into(imageView)
             }
 
@@ -54,12 +55,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupButton(button:Button) {
-        val imageView = findViewById<ImageView>(R.id.petImage)
-        val button = findViewById<Button>(R.id.petButton)
         button.setOnClickListener {
-            fetchDogImage(
-                imageview = TODO()
-            )
+            fetchDogImage()
         }
     }
 
