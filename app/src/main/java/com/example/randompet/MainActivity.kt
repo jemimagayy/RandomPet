@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.codepath.asynchttpclient.AsyncHttpClient
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler
 import okhttp3.Headers
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,11 +55,40 @@ class MainActivity : AppCompatActivity() {
         }]
     }
 
-    private fun setupButton(button:Button) {
-        button.setOnClickListener {
-            fetchDogImage()
-        }
+    private fun fetchCatImage() {
+        val client = AsyncHttpClient()
+
+        client["https://api.thecatapi.com/v1/images/search", object : JsonHttpResponseHandler() {
+            override fun onSuccess(statusCode: Int, headers: Headers, json: JsonHttpResponseHandler.JSON) {
+                var resultsJSON = json.jsonArray.getJSONObject(0)
+                val petImageURL = resultsJSON.getString("url")
+                Log.d("petImageURL", "pet image URL set: $petImageURL")
+
+                val imageView = findViewById<ImageView>(R.id.petImage)
+                Glide.with(this@MainActivity).load(petImageURL).fitCenter().into(imageView)
+            }
+
+            override fun onFailure(
+                statusCode: Int,
+                headers: Headers?,
+                errorResponse: String,
+                throwable: Throwable?
+            ) {
+                Log.d("Cat Error", errorResponse)
+            }
+        }]
     }
 
-}
+    private fun setupButton(button:Button) {
+        button.setOnClickListener {
+        var choice = Random.nextInt(2)
+
+        if (choice == 0) {
+            fetchDogImage()
+        }
+        else {
+            fetchCatImage()
+        }
+    }}}
+
 
